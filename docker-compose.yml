@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  server:
+    build: ./
+    working_dir: /server/
+    container_name: mini_bank_server
+    restart: "always"
+    ports:
+      - "8000:8000"
