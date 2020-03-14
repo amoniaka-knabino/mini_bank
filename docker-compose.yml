@@ -7,13 +7,12 @@ services:
             - 80:80
         depends_on:
             - web
-        restart: "always"
-
+        restart: on-failure:3 
     web:
         build:
             context: ./server
         container_name: mini_bank_gunicorn
-        restart: "always"
+        restart: on-failure:3 
         expose:
              - 8000
 
