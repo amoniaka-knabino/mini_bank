@@ -34,7 +34,8 @@ class Subscriber:
     
     def __str__(self):
         return (f"uuid: {self.uuid}, name: {self.name}, "
-                f"balance: {self.balance}, hold: {self.hold}, status: {'opened' if self.status else 'closed'}") 
+                f"balance: {self.balance}, hold: {self.hold}, "
+                f"status: {'opened' if self.status else 'closed'}") 
 
 
 def load_user(uuid: uuid4, name, balance, hold, status):
