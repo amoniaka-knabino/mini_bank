@@ -1,6 +1,7 @@
 import unittest
 
 from Subscriber import Subscriber, generate_user
+from Database import Database
 import exceptions as e
 
 class TestSimple(unittest.TestCase):
@@ -34,5 +35,4 @@ class TestSimple(unittest.TestCase):
     def test_closed(self):
         user = generate_user(0,0,False)
         with self.assertRaises(e.ClosedAccountException): user.add(10)
-
 

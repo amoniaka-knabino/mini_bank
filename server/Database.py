@@ -1,5 +1,5 @@
 import sqlite3
-from Subscriber import Subscriber, generate_user
+from Subscriber import Subscriber, generate_user, get_subs_set_from_json
 import json
 
 class Database:
@@ -38,8 +38,13 @@ class Database:
                 values (?, ?, ?, ?, ?);""", [str(sub.uuid), sub.name, sub.balance, sub.hold, status])
         self.conn.commit()
 
-    def _all_subs(self):
-        return self.cursor.execute("select * from subscribers;").fetchall()
+    def all_users(self):
+        records = self.cursor.execute("select * from subscribers;").fetchall()
+        subscribers = set()
+        for u in records:
+            sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
+            subscribers.add(sub)
+        return subscribers
     
     def drop_table_if_exists(self):
         self.cursor.execute("drop table if exists subscribers;")
@@ -49,14 +54,9 @@ class Database:
         self.create_if_not_exists()
     
     def load_from_json(self, filename="server/example.json"):
-        with open(filename) as f:
-            subs_from_json = json.loads(f.read())
-        subscribers = []
-        for u in subs_from_json:
-            sub = Subscriber(u["uuid"], u["name"], u["balance"], u["hold"], u["status"])
-            subscribers.append(sub)
+        subscribers = get_subs_set_from_json(filename)
         self.insert_multiple_subscriber(subscribers)
-        print(self._all_subs())
+        print(self.all_users())
 
 
 
