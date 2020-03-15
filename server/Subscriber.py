@@ -46,6 +46,9 @@ class Subscriber:
         Гарантируется, что uuid уникален в пределах множества абонентов => использовать его хэш эффективней, чем хэш имени или другого поля
         """
         return self.uuid.__hash__()
+    
+    def dict_for_json(self):
+        return {"uuid":self.uuid, "name":self.name, "balance":self.balance, "hold":self.hold, "status":str(self.status)}
 
 
 def generate_user(balance, hold, status):

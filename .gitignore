@@ -1,4 +1,6 @@
 __pycache__
+.pytest_cache
 subsribers.db
 test.db
-.pytest_cache
+server/subscribers.db
+server/test.db

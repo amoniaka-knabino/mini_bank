@@ -3,7 +3,7 @@ from Subscriber import Subscriber, generate_user, get_subs_set_from_json
 import json
 
 class Database:
-    def __init__(self, db_filename="subsribers.db"):
+    def __init__(self, db_filename):
         self.conn = sqlite3.connect(db_filename)
         self.cursor = self.conn.cursor()
         self.refresh()
@@ -56,7 +56,14 @@ class Database:
     def load_from_json(self, filename="server/example.json"):
         subscribers = get_subs_set_from_json(filename)
         self.insert_multiple_subscriber(subscribers)
-        print(self.all_users())
+        return self.all_users()
+    
+    def dump_users_to_dict_for_json(self):
+        subs = []
+        users = self.all_users()
+        for u in users:
+            subs.append(u.dict_for_json())
+        return subs
 
 
 
