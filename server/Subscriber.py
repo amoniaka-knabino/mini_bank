@@ -43,13 +43,3 @@ def load_user(uuid: uuid4, name, balance, hold, status):
 
 def generate_user(balance, hold, status):
     return Subscriber(uuid4(), "generated", balance, hold, status)
-
-if __name__ == "__main__":
-    a = generate_user(122,10,True)
-    print(a)
-    a.substract(100)
-    print(a)
-    a.substract_hold()
-    print(a)
-    a.substract(100)
-    print(a)
