@@ -37,10 +37,6 @@ class Subscriber:
                 f"status: {'opened' if self.status else 'closed'}") 
 
 
-
-
-
-
 def load_user(uuid: uuid4, name, balance, hold, status):
     return Subscriber(uuid, name, balance, hold, status)
 
