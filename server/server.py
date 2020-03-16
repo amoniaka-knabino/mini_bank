@@ -87,7 +87,7 @@ def substract():
     try:
         user = db.select_user_by_uuid(uuid)
         user.substract(summ)
-        print(f"sub {summ} to {user.uuid}, now hold is {user.hold}")
+        print(f"sub {summ} from {user.uuid}, now hold is {user.hold}")
         db.update_hold(user)
         return jsonify({"status":200, "result": True, "addition":addition})
     except e.UserNotFoundException:
