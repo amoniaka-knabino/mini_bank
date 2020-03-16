@@ -1,10 +1,15 @@
-from uuid import uuid4
+from uuid import uuid4, UUID
 import decorators as d
 import json
 
 class Subscriber:
-    def __init__(self, uuid: uuid4, name, balance, hold, status):
-        self.uuid = uuid
+    def __init__(self, uuid, name, balance, hold, status):
+        if (type(uuid) is UUID):
+            self.uuid = uuid
+        elif (type(uuid) is str):
+            self.uuid = UUID(uuid)
+        else:
+            raise ValueError
         self.name = str(name)
         self.balance = int(balance)
         self.hold = int(hold)

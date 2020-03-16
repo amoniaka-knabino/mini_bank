@@ -19,10 +19,10 @@ class Database:
             );""")
         self.conn.commit()
     
-    def insert_one_subscriber(self, sub):
+    def update_or_add_one_subscriber(self, sub):
         status = 1 if sub.status else 0
         self.cursor.execute(
-            """insert into subscribers (
+            """insert or replace into subscribers (
                 uuid, name, balance, hold, status
             )
             values (?, ?, ?, ?, ?);""", [str(sub.uuid), sub.name, sub.balance, sub.hold, status])
