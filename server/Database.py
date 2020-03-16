@@ -1,6 +1,7 @@
 import sqlite3
 from Subscriber import Subscriber, generate_user, get_subs_set_from_json
 import json
+from exceptions import UserNotFoundException
 
 class Database:
     def __init__(self, db_filename):
@@ -48,6 +49,9 @@ class Database:
     
     def select_user_by_uuid(self, uuid):
         u = self.cursor.execute('select * from subscribers where "uuid"= ?;',(str(uuid),)).fetchone()
+        print(u)
+        if u is None:
+            raise UserNotFoundException
         sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
         return sub
     

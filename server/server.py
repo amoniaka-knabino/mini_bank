@@ -1,8 +1,8 @@
 import json
 from flask import Flask, jsonify, request
-app = Flask(__name__)
-
 from Database import Database
+import exceptions as e
+app = Flask(__name__)
 db = None
 
 @app.before_request
@@ -28,10 +28,12 @@ def user():
     global db
     try:
         uuid = request.args.get('uuid')
-        #return jsonify(db.select_user_by_uuid(uuid).dict_for_json())
         addition = db.select_user_by_uuid(uuid).dict_for_json()
-        status = 200
-        result = True
-        return jsonify({"status":200, "result": True, "addition":addition}) 
+        return jsonify({"status":200, "result": True, "addition":addition})
+    except e.UserNotFoundException:
+        http_code = 500
+        return jsonify({"status":http_code, "result": False,
+                        "addition":{"uuid":uuid}, "description": "User is not found in database"}), http_code
     except:
-        return jsonify({"status":500, "result": False})
+        http_code = 500
+        return jsonify({"status":http_code, "result": False}), http_code

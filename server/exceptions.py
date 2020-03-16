@@ -3,3 +3,6 @@ class API_Exception(Exception):
 
 class ClosedAccountException(API_Exception):
     pass
+
+class UserNotFoundException(API_Exception):
+    pass
