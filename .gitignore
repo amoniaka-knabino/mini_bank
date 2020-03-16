@@ -4,3 +4,5 @@ subsribers.db
 test.db
 server/subscribers.db
 server/test.db
+server/debug.py
+server/tests/test_Server.py
