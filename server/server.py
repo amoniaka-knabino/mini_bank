@@ -72,6 +72,29 @@ def add():
         http_code = 500
         return jsonify({"status":http_code, "result": False}), http_code
 
-@app.route('/api/substact', methods=["POST"])
+@app.route('/api/substract', methods=["POST"])
 def substract():
-    pass
+    global db
+    try:
+        posted_json = request.get_json()
+        print(posted_json)
+        addition = posted_json["addition"]
+        uuid = addition["uuid"]
+        summ = addition["sum"]
+    except:
+        http_code = 400
+        return jsonify({"status":http_code, "result": False}), http_code
+    try:
+        user = db.select_user_by_uuid(uuid)
+        user.substract(summ)
+        print(f"sub {summ} to {user.uuid}, now hold is {user.hold}")
+        db.update_hold(user)
+        return jsonify({"status":200, "result": True, "addition":addition})
+    except e.UserNotFoundException:
+        http_code = 404
+        return jsonify({"status":http_code, "result": False,
+                        "addition":{"uuid":uuid},
+                        "description": "User is not found in database"}), http_code
+    except:
+        http_code = 500
+        return jsonify({"status":http_code, "result": False}), http_code

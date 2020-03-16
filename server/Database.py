@@ -22,6 +22,10 @@ class Database:
         self.cursor.execute('update subscribers set balance=%s where uuid=%s', ((sub.balance, str(sub.uuid))))
         self.conn.commit()
     
+    def update_hold(self, sub):
+        self.cursor.execute('update subscribers set hold=%s where uuid=%s', ((sub.hold, str(sub.uuid))))
+        self.conn.commit()
+    
     def insert_multiple_subscriber(self, sub_dict):
         for sub in sub_dict:
             self.add_one_subscriber(sub)
