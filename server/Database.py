@@ -1,46 +1,34 @@
-import sqlite3
+import psycopg2
+from psycopg2 import sql
 from Subscriber import Subscriber, generate_user, get_subs_set_from_json
 import json
-from exceptions import UserNotFoundException
 
 class Database:
-    def __init__(self, db_filename):
-        self.conn = sqlite3.connect(db_filename)
+    def __init__(self):
+        self.conn = psycopg2.connect(dbname='postgres', user='postgres', 
+                        password='postgres', host='localhost')
         self.cursor = self.conn.cursor()
-        self.refresh()
     
-    def create_if_not_exists(self):
-        self.cursor.execute(
-            """create table if not exists subscribers (
-                uuid text not null unique,
-                name text not null,
-                balance integer not null,
-                hold integer not null,
-                status integer not null
-            );""")
+    def add_one_subscriber(self, sub):
+        status = 1 if sub.status else 0
+        values = [(str(sub.uuid), sub.name, sub.balance, sub.hold, status),]
+        insert = sql.SQL('INSERT INTO subscribers (uuid, name, balance, hold, status) VALUES {}').format(
+            sql.SQL(',').join(map(sql.Literal, values))
+        )
+        self.cursor.execute(insert)
         self.conn.commit()
     
-    def update_or_add_one_subscriber(self, sub):
-        status = 1 if sub.status else 0
-        self.cursor.execute(
-            """insert or replace into subscribers (
-                uuid, name, balance, hold, status
-            )
-            values (?, ?, ?, ?, ?);""", [str(sub.uuid), sub.name, sub.balance, sub.hold, status])
+    def update_balance(self, sub):
+        self.cursor.execute('update subscribers set balance=%s where uuid=%s', ((sub.balance, str(sub.uuid))))
         self.conn.commit()
     
     def insert_multiple_subscriber(self, sub_dict):
         for sub in sub_dict:
-            status = 1 if sub.status else 0
-            self.cursor.execute(
-                """insert into subscribers (
-                    uuid, name, balance, hold, status
-                )
-                values (?, ?, ?, ?, ?);""", [str(sub.uuid), sub.name, sub.balance, sub.hold, status])
-        self.conn.commit()
+            self.add_one_subscriber(sub)
 
     def all_users(self):
-        records = self.cursor.execute("select * from subscribers;").fetchall()
+        self.cursor.execute("select * from subscribers;")
+        records = self.cursor.fetchall()
         subscribers = set()
         for u in records:
             sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
@@ -48,19 +36,14 @@ class Database:
         return subscribers
     
     def select_user_by_uuid(self, uuid):
-        u = self.cursor.execute('select * from subscribers where "uuid"= ?;',(str(uuid),)).fetchone()
-        print(u)
-        if u is None:
-            raise UserNotFoundException
+        #self.cursor.execute('select * from subscribers where "uuid"= ?;',(str(uuid),))
+        self.cursor.execute('select * from subscribers where "uuid"= %s', (str(uuid),))
+        u = self.cursor.fetchone()
         sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
         return sub
     
     def drop_table_if_exists(self):
         self.cursor.execute("drop table if exists subscribers;")
-    
-    def refresh(self):
-        self.drop_table_if_exists()
-        self.create_if_not_exists()
     
     def load_from_json(self, filename="server/example.json"):
         subscribers = get_subs_set_from_json(filename)
