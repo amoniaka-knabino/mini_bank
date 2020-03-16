@@ -46,6 +46,11 @@ class Database:
             subscribers.add(sub)
         return subscribers
     
+    def select_user_by_uuid(self, uuid):
+        u = self.cursor.execute('select * from subscribers where "uuid"= ?;',(str(uuid),)).fetchone()
+        sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
+        return sub
+    
     def drop_table_if_exists(self):
         self.cursor.execute("drop table if exists subscribers;")
     
@@ -64,6 +69,7 @@ class Database:
         for u in users:
             subs.append(u.dict_for_json())
         return subs
+
 
 
 
