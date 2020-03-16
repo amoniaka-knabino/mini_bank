@@ -21,7 +21,7 @@ class Subscriber:
     @d.check_status
     def substract(self, delta):
         if (self.check_substract(delta)):
-            self.balance -= delta
+            self.hold += delta
     
     @d.check_status
     def check_substract(self, substraction):
