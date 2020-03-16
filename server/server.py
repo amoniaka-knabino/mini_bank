@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 from Database import Database
@@ -23,3 +23,15 @@ def ping():
 def users():
     return jsonify(db.dump_users_to_dict_for_json())
 
+@app.route('/api/status')
+def user():
+    global db
+    try:
+        uuid = request.args.get('uuid')
+        #return jsonify(db.select_user_by_uuid(uuid).dict_for_json())
+        addition = db.select_user_by_uuid(uuid).dict_for_json()
+        status = 200
+        result = True
+        return jsonify({"status":200, "result": True, "addition":addition}) 
+    except:
+        return jsonify({"status":500, "result": False})
