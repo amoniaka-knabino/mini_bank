@@ -97,3 +97,21 @@ def substract():
     except:
         http_code = 500
         return jsonify({"status":http_code, "result": False}), http_code
+
+@app.route('/api/refresh')
+def refresh_db():
+    db.drop_table()
+    db.create_table()
+    return jsonify({"status":200, "result": True})
+
+@app.route('/api/load_db', methods=["POST"])
+def load_db_from_json():
+    global db
+    try:
+        posted_json = request.get_json()
+        print(posted_json)
+        db.load_from_json(posted_json)
+        return jsonify({"status":200, "result": True})
+    except:
+        http_code = 500
+        return jsonify({"status":http_code, "result": False}), http_code

@@ -59,9 +59,12 @@ class Subscriber:
 def generate_user(balance, hold, status):
     return Subscriber(uuid4(), "generated", balance, hold, status)
 
-def get_subs_set_from_json(filename):
+def get_subs_set_from_json_file(filename):
     with open(filename) as f:
         subs_from_json = json.loads(f.read())
+        return get_subs_set_from_json(subs_from_json)
+
+def get_subs_set_from_json(subs_from_json):
     subscribers = set()
     for u in subs_from_json:
         sub = Subscriber(u["uuid"], u["name"], u["balance"], u["hold"], u["status"])
