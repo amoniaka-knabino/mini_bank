@@ -5,6 +5,8 @@ import helpers.exceptions as e
 import helpers.decorators as d
 import time
 import threading
+import markdown
+import markdown.extensions.fenced_code
 
 app = Flask(__name__)
 def hold_controller():
@@ -22,7 +24,12 @@ def before_request():
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    with open('README.md') as f:
+        md_template_string = markdown.markdown(
+        f.read(), extensions=["fenced_code"]
+    )
+
+    return md_template_string
 
 @app.route('/api/ping')
 def ping():

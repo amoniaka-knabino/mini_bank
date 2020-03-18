@@ -25,6 +25,18 @@ class TestAPI(unittest.TestCase):
                     if (d1 == d2):
                         equals += 1
         self.assertEqual(len(json_to_load["addition"]), equals)
+    
+    def test_add(self):
+        pass
+    
+    def test_substract(self):
+        pass
+
+    def test_negative_sum(self):
+        pass
+
+    def test_closed_acc(self):
+        pass
                         
 
 

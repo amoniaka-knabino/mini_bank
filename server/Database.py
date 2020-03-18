@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2 import sql
-from Subscriber import Subscriber, generate_user, get_subs_set_from_json
+from Subscriber import Subscriber, get_subs_set_from_json
 import json
 import helpers.exceptions as e
 

@@ -55,7 +55,9 @@ P.S. status == 1 => счет открыт
 
 #### запуск
 
-запуск приложения: `docker-compose up --build`
+запуск приложения: `docker-compose up --build -d` \ `./start.sh`
+остановка: `docker-compose down -v` \ `./stop.sh`
+
 отдельно от бд приложение можно запустить `python3 wsgi.py` , но нужно будет поменять `host` в инициализации Database в server/Database.py
 
 #### тесты
@@ -67,14 +69,17 @@ P.S. status == 1 => счет открыт
 #### deploy details
 done
 #### code
-1. done
-2. добавить документацию вместо hello world
-3. обработка исключений бд
-4. done
+1. add_subscribers не вызывая add_one_subscriber
+2. done
+3. обработка исключений бд (особенно повторный инсерт)
+4. print -> logger
 5. done
 6. исправить опечатку в subtract
 7. проверить завершение потоков
 8. тесты на апишку (in process)
+9. PEP8
+10. refactor var names
+11. логи внутри докера тоже
 #### tests
 1. сохранение состояние бд и восстановление его после выполнения тестов 
 
