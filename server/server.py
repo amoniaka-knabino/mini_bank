@@ -9,7 +9,6 @@ db = None
 def before_request():
     global db 
     db = Database()
-    #db.load_from_json("example.json")
 
 @app.route('/')
 def hello_world():

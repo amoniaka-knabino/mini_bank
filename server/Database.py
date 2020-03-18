@@ -6,8 +6,22 @@ import json
 class Database:
     def __init__(self):
         self.conn = psycopg2.connect(dbname='postgres', user='postgres', 
-                        password='postgres', host='localhost')
+                        password='postgres', host='postgres')
         self.cursor = self.conn.cursor()
+        #self.drop_table()
+        #self.create_table()
+    
+    def create_table(self):
+        self.cursor.execute("""create table if not exists public.subscribers(
+uuid varchar not null unique,
+name varchar not null,
+balance integer not null,
+hold integer not null,
+status integer not null);""")
+        self.conn.commit()
+    
+    def drop_table(self):
+        self.cursor.execute("drop table subscribers;")
     
     def add_one_subscriber(self, sub):
         status = 1 if sub.status else 0
@@ -45,9 +59,6 @@ class Database:
         u = self.cursor.fetchone()
         sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
         return sub
-    
-    def drop_table_if_exists(self):
-        self.cursor.execute("drop table if exists subscribers;")
     
     def load_from_json(self, filename="server/example.json"):
         subscribers = get_subs_set_from_json(filename)

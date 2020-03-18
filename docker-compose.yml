@@ -1,5 +1,25 @@
 version: '3.7'
 services:
+    postgres:
+        image: postgres:11
+        ports:
+          - 5432:5432
+        environment:
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+        volumes:
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        restart: on-failure:3
+    web:
+        build:
+            context: ./server
+        container_name: mini_bank_gunicorn
+        restart: on-failure:3 
+        depends_on:
+             - postgres
+        expose:
+             - 8000
 
     nginx:
         build: ./nginx
@@ -7,12 +27,5 @@ services:
             - 80:80
         depends_on:
             - web
-        restart: on-failure:3 
-    web:
-        build:
-            context: ./server
-        container_name: mini_bank_gunicorn
-        restart: on-failure:3 
-        expose:
-             - 8000
-
+            - postgres
+        restart: on-failure:3

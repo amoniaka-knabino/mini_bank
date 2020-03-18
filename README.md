@@ -45,7 +45,7 @@ done
 6. done
 7. done
 8. написать доку
-9. постгрес в докер
+
 
 #### questions
 1. json в nginx???
