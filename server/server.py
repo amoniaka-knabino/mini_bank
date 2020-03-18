@@ -2,6 +2,7 @@ import json
 from flask import Flask, jsonify, request
 from Database import Database
 import helpers.exceptions as e
+import helpers.decorators as d
 import time
 import threading
 
@@ -36,15 +37,9 @@ def users():
     return jsonify(db.dump_users_to_dict_for_json())
 
 @app.route('/api/status', methods=["POST"])
-def user_from_json():
+@d.need_args("uuid")
+def user_from_json(uuid=None):
     global db
-    try:
-        posted_json = request.get_json()
-        print(posted_json)
-        uuid = posted_json["addition"]["uuid"]
-    except:
-        http_code = 400
-        return jsonify({"status":http_code, "result": False}), http_code
     try:
         addition = db.select_user_by_uuid(uuid).dict_for_json()
         return jsonify({"status":200, "result": True, "addition":addition})
@@ -57,24 +52,18 @@ def user_from_json():
         http_code = 500
         return jsonify({"status":http_code, "result": False}), http_code
 
+
+
 @app.route('/api/add', methods=["POST"])
-def add():
+@d.need_args("sum", "uuid")
+def add(sum=None, uuid=None):
     global db
     try:
-        posted_json = request.get_json()
-        print(posted_json)
-        addition = posted_json["addition"]
-        uuid = addition["uuid"]
-        summ = addition["sum"]
-    except:
-        http_code = 400
-        return jsonify({"status":http_code, "result": False}), http_code
-    try:
         user = db.select_user_by_uuid(uuid)
-        user.add(summ)
-        print(f"add {summ} to {user.uuid}, now balance is {user.balance}")
+        user.add(sum)
+        print(f"add {sum} to {user.uuid}, now balance is {user.balance}")
         db.update_balance(user)
-        return jsonify({"status":200, "result": True, "addition":addition})
+        return jsonify({"status":200, "result": True})
     except e.UserNotFoundException:
         http_code = 404
         return jsonify({"status":http_code, "result": False,
@@ -84,24 +73,18 @@ def add():
         http_code = 500
         return jsonify({"status":http_code, "result": False}), http_code
 
+
 @app.route('/api/substract', methods=["POST"])
-def substract():
+@d.need_args("sum", "uuid")
+def substract(sum=None, uuid=None):
     global db
     try:
-        posted_json = request.get_json()
-        print(posted_json)
-        addition = posted_json["addition"]
-        uuid = addition["uuid"]
-        summ = addition["sum"]
-    except:
-        http_code = 400
-        return jsonify({"status":http_code, "result": False}), http_code
-    try:
+        print(f"extracted params is : {(sum, uuid)}")
         user = db.select_user_by_uuid(uuid)
-        user.substract(summ)
-        print(f"sub {summ} from {user.uuid}, now hold is {user.hold}")
+        user.substract(sum)
+        print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
         db.update_hold(user)
-        return jsonify({"status":200, "result": True, "addition":addition})
+        return jsonify({"status":200, "result": True})
     except e.UserNotFoundException:
         http_code = 404
         return jsonify({"status":http_code, "result": False,
@@ -122,7 +105,7 @@ def load_db_from_json():
     global db
     try:
         posted_json = request.get_json()
-        print(posted_json)
+        print(f"json from POST request: {posted_json}")
         db.load_from_json(posted_json)
         return jsonify({"status":200, "result": True})
     except:
