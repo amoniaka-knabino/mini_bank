@@ -4,11 +4,20 @@ from Subscriber import Subscriber, generate_user, get_subs_set_from_json
 import json
 import helpers.exceptions as e
 
-class Database:
+
+class DatabaseClient:
     def __init__(self):
+        pass
+    
+    def __enter__(self):
         self.conn = psycopg2.connect(dbname='postgres', user='postgres', 
                         password='postgres', host='localhost')
         self.cursor = self.conn.cursor()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.cursor:
+            self.conn.close()
     
     def create_table(self):
         self.cursor.execute("""create table if not exists public.subscribers(

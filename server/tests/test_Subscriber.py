@@ -1,7 +1,6 @@
 import unittest
 
 from Subscriber import Subscriber, generate_user
-from Database import Database
 import helpers.exceptions as e
 
 class TestSimple(unittest.TestCase):
