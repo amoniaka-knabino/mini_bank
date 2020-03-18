@@ -1,5 +1,6 @@
 from uuid import uuid4, UUID
 import helpers.decorators as d
+import helpers.exceptions as e
 import json
 
 class Subscriber:
@@ -21,10 +22,12 @@ class Subscriber:
     
     @d.check_status
     def add(self, delta):
+        self.check_param(delta)
         self.balance += delta
     
     @d.check_status
     def substract(self, delta):
+        self.check_param(delta)
         if (self.check_substract(delta)):
             self.hold += delta
     
@@ -35,6 +38,9 @@ class Subscriber:
             return False
         else:
             return True
+    def check_param(self, sum):
+        if sum < 0:
+            raise e.InvalidSumException
     
     def __str__(self):
         return (f"uuid: {self.uuid}, name: {self.name}, "
