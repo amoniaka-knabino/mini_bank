@@ -2,13 +2,26 @@ import json
 from flask import Flask, jsonify, request
 from Database import Database
 import helpers.exceptions as e
+import time
+import threading
+
 app = Flask(__name__)
 db = None
 
-@app.before_request
+def hold_controller():
+    while(True):
+        if db is not None:
+            time.sleep(60*10)
+            print("Making everyones hold to zero")
+            db.substract_hold_of_every_sub()
+            
+
+@app.before_first_request
 def before_request():
     global db 
     db = Database()
+    thread = threading.Thread(target=hold_controller)
+    thread.start()
 
 @app.route('/')
 def hello_world():

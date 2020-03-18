@@ -39,6 +39,13 @@ status integer not null);""")
         self.cursor.execute('update subscribers set hold=%s where uuid=%s', ((sub.hold, str(sub.uuid))))
         self.conn.commit()
     
+    def substract_hold_of_every_sub(self):
+        users = self.all_users()
+        for u in users:
+            print(f"substract {u.uuid} hold")
+            u.substract_hold()
+            self.update_hold(u)
+    
     def insert_multiple_subscriber(self, sub_dict):
         for sub in sub_dict:
             self.add_one_subscriber(sub)

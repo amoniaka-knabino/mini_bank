@@ -2,7 +2,7 @@ import unittest
 
 from Subscriber import Subscriber, generate_user
 from Database import Database
-import exceptions as e
+import helpers.exceptions as e
 
 class TestSimple(unittest.TestCase):
     def test_add(self):
