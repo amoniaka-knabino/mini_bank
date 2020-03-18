@@ -71,14 +71,14 @@ status integer not null);""")
     def load_from_jsonfile(self, filename="server/example.json"):
         subscribers = get_subs_set_from_json(filename)
         for u in subscribers:
-            print(u)
+            print(f"subsriber from jsonfile: {u}")
         self.insert_multiple_subscriber(subscribers)
         return self.all_users()
 
     def load_from_json(self, json_with_subs_list):
         subscribers = get_subs_set_from_json(json_with_subs_list)
         for u in subscribers:
-            print(u)
+            print(f"subsriber from json: {u}")
         self.insert_multiple_subscriber(subscribers)
         return self.all_users()
     

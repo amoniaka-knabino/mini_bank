@@ -16,17 +16,16 @@ def need_args(*needed_args_list):
     def real_decorator(func):
         @wraps(func)
         def inner(*args, **kws):
-            try:
-                posted_json = request.get_json()
-                print(posted_json)
-                kwargs = {}
-                for key in needed_args_list:
+            posted_json = request.get_json()
+            print(f"posted json: {posted_json}")
+            kwargs = {}
+            for key in needed_args_list:
+                if key == 'addition':
+                    kwargs[key] = posted_json[key]
+                else:
                     kwargs[key] = posted_json["addition"][key]
-                print(f"extract: {kwargs}")
-                return func(**kwargs)
-            except Exception as e:
-                print(e)
+            print(f"extracted: {kwargs}")
+            return func(**kwargs)
         return inner
-
     return real_decorator
     

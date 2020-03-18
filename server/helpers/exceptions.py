@@ -36,5 +36,6 @@ def handle_exception(exception, addition):
                         "addition":addition,
                         "description": "Bad JSON"}), http_code
     else:
+        print(exception)
         http_code = 500
         return jsonify({"status":http_code, "result": False}), http_code

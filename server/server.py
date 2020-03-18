@@ -34,15 +34,13 @@ def ping():
 
 @app.route('/api/subs')
 def users():
-    return jsonify(db.dump_users_to_dict_for_json())
+    return jsonify({"addition": db.dump_users_to_dict_for_json()})
 
 @app.route('/api/status', methods=["POST"])
-@d.need_args("uuid")
-def user_from_json(uuid=None):
+@d.need_args("uuid", "addition")
+def user_from_json(uuid=None, addition=None):
     global db
-    addition = None
     try:
-        addition = request.get_json()["addition"]
         addition = db.select_user_by_uuid(uuid).dict_for_json()
         return jsonify({"status":200, "result": True, "addition":addition})
     except Exception as exception:
@@ -50,12 +48,10 @@ def user_from_json(uuid=None):
 
 
 @app.route('/api/add', methods=["POST"])
-@d.need_args("sum", "uuid")
-def add(sum=None, uuid=None):
+@d.need_args("sum", "uuid", "addition")
+def add(sum=None, uuid=None, addition=None):
     global db
-    addition = None
     try:
-        addition = request.get_json()["addition"]
         user = db.select_user_by_uuid(uuid)
         user.add(sum)
         print(f"add {sum} to {user.uuid}, now balance is {user.balance}")
@@ -66,12 +62,10 @@ def add(sum=None, uuid=None):
 
 
 @app.route('/api/substract', methods=["POST"])
-@d.need_args("sum", "uuid")
-def substract(sum=None, uuid=None):
+@d.need_args("sum", "uuid", "addition")
+def substract(sum=None, uuid=None, addition=None):
     global db
-    addition = None
     try:
-        addition = request.get_json()["addition"]
         print(f"extracted params is : {(sum, uuid)}")
         user = db.select_user_by_uuid(uuid)
         user.substract(sum)
@@ -89,14 +83,12 @@ def refresh_db():
     return jsonify({"status":200, "result": True})
 
 @app.route('/api/load_db', methods=["POST"])
-def load_db_from_json():
+@d.need_args("addition")
+def load_db_from_json(addition=None):
     global db
-    addition = None
     try:
-        posted_json = request.get_json()
-        addition = posted_json["addition"]
-        print(f"json from POST request: {posted_json}")
-        db.load_from_json(posted_json)
-        return jsonify({"status":200, "result": True})
+        print(f"json['addition'] from POST request: {addition}")
+        db.load_from_json(addition)
+        return jsonify({"status":200, "result": True, "addition":addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)
