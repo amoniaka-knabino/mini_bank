@@ -43,14 +43,9 @@ def user_from_json(uuid=None):
     try:
         addition = db.select_user_by_uuid(uuid).dict_for_json()
         return jsonify({"status":200, "result": True, "addition":addition})
-    except e.UserNotFoundException:
-        http_code = 404
-        return jsonify({"status":http_code, "result": False,
-                        "addition":{"uuid":uuid},
-                        "description": "User is not found in database"}), http_code
-    except:
-        http_code = 500
-        return jsonify({"status":http_code, "result": False}), http_code
+    except Exception as exception:
+        return e.handle_exception(exception, {"uuid":uuid})
+
 
 
 
@@ -64,14 +59,8 @@ def add(sum=None, uuid=None):
         print(f"add {sum} to {user.uuid}, now balance is {user.balance}")
         db.update_balance(user)
         return jsonify({"status":200, "result": True})
-    except e.UserNotFoundException:
-        http_code = 404
-        return jsonify({"status":http_code, "result": False,
-                        "addition":{"uuid":uuid},
-                        "description": "User is not found in database"}), http_code
-    except:
-        http_code = 500
-        return jsonify({"status":http_code, "result": False}), http_code
+    except Exception as exception:
+        return e.handle_exception(exception, {"sum":sum, "uuid":uuid})
 
 
 @app.route('/api/substract', methods=["POST"])
@@ -85,14 +74,9 @@ def substract(sum=None, uuid=None):
         print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
         db.update_hold(user)
         return jsonify({"status":200, "result": True})
-    except e.UserNotFoundException:
-        http_code = 404
-        return jsonify({"status":http_code, "result": False,
-                        "addition":{"uuid":uuid},
-                        "description": "User is not found in database"}), http_code
-    except:
-        http_code = 500
-        return jsonify({"status":http_code, "result": False}), http_code
+    except Exception as exception:
+        return e.handle_exception(exception, {"sum":sum, "uuid":uuid})
+
 
 @app.route('/api/refresh')
 def refresh_db():
@@ -108,6 +92,5 @@ def load_db_from_json():
         print(f"json from POST request: {posted_json}")
         db.load_from_json(posted_json)
         return jsonify({"status":200, "result": True})
-    except:
-        http_code = 500
-        return jsonify({"status":http_code, "result": False}), http_code
+    except Exception as exception:
+        return e.handle_exception(exception, {})
