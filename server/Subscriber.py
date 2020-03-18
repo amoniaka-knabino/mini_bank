@@ -1,5 +1,5 @@
 from uuid import uuid4, UUID
-import decorators as d
+import helpers.decorators as d
 import json
 
 class Subscriber:

@@ -1,5 +1,5 @@
 from functools import wraps
-import exceptions as e
+import helpers.exceptions as e
 
 def check_status(func):
     @wraps(func)

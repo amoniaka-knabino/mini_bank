@@ -1,7 +1,7 @@
 import json
 from flask import Flask, jsonify, request
 from Database import Database
-import exceptions as e
+import helpers.exceptions as e
 app = Flask(__name__)
 db = None
 

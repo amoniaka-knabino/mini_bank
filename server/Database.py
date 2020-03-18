@@ -2,11 +2,12 @@ import psycopg2
 from psycopg2 import sql
 from Subscriber import Subscriber, generate_user, get_subs_set_from_json
 import json
+import helpers.exceptions as e
 
 class Database:
     def __init__(self):
         self.conn = psycopg2.connect(dbname='postgres', user='postgres', 
-                        password='postgres', host='postgres')
+                        password='postgres', host='localhost')
         self.cursor = self.conn.cursor()
     
     def create_table(self):
@@ -55,6 +56,8 @@ status integer not null);""")
         #self.cursor.execute('select * from subscribers where "uuid"= ?;',(str(uuid),))
         self.cursor.execute('select * from subscribers where "uuid"= %s', (str(uuid),))
         u = self.cursor.fetchone()
+        if u is None:
+            raise e.UserNotFoundException
         sub = Subscriber(u[0], u[1], u[2], u[3], u[4]==1)
         return sub
     

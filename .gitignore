@@ -1,8 +1,4 @@
 __pycache__
 .pytest_cache
-subsribers.db
-test.db
-server/subscribers.db
-server/test.db
+server/example.json
 server/debug.py
-server/tests/test_Server.py
