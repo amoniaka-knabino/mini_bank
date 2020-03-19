@@ -65,11 +65,7 @@ def add(sum=None, uuid=None, addition=None):
     try:
         with DatabaseClient() as db:
             with db_changing_lock:
-                user = db.select_user_by_uuid(uuid)
-                user.add(sum)
-                print(
-                    f"add {sum} to {user.uuid}, now balance is {user.balance}")
-                db.update_balance(user)
+                db.add_money_to_sub(uuid, sum)
             return jsonify({"status": 200, "result": True, "addition": addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)
@@ -82,10 +78,7 @@ def substract(sum=None, uuid=None, addition=None):
         with DatabaseClient() as db:
             print(f"extracted params is : {(sum, uuid)}")
             with db_changing_lock:
-                user = db.select_user_by_uuid(uuid)
-                user.substract(sum)
-                print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
-                db.update_hold(user)
+                db.substract_money_from_sub(uuid, sum)
             return jsonify({"status": 200, "result": True, "addition": addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)

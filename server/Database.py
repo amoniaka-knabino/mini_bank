@@ -65,6 +65,20 @@ status integer not null);""")
             print(f"substract {u.uuid} hold")
             u.substract_hold()
             self.update_hold(u)
+            self.update_balance(u)
+
+    def add_money_to_sub(self, uuid, sum):
+        user = self.select_user_by_uuid(uuid)
+        user.add(sum)
+        print(
+            f"add {sum} to {user.uuid}, now balance is {user.balance}")
+        self.update_balance(user)
+
+    def substract_money_from_sub(self, uuid, sum):
+        user = self.select_user_by_uuid(uuid)
+        user.substract(sum)
+        print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
+        self.update_hold(user)
 
     def all_users(self):
         self.cursor.execute("select * from subscribers;")
