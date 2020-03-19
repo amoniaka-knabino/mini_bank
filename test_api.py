@@ -1,9 +1,10 @@
 from sys import argv
 import json, urllib.request
 import unittest
+import server.helpers.exceptions as e
 
 host = "localhost:8000"
-#host = "167.172.155.67/
+#host = "167.172.155.67/"
 
 class TestAPI(unittest.TestCase):
     def test_load(self):
@@ -36,7 +37,19 @@ class TestAPI(unittest.TestCase):
         pass
 
     def test_closed_acc(self):
-        pass
+        with open('example.json', 'rb') as f:
+            req = urllib.request.Request("http://"+host+"/api/refresh")
+            urllib.request.urlopen(req)
+
+            json_to_load_bytes = f.read()
+        req = urllib.request.Request("http://"+host+"/api/load_db", data=json_to_load_bytes,
+                                    headers={'content-type': 'application/json'})
+        _ = urllib.request.urlopen(req)
+        with self.assertRaises(urllib.error.HTTPError):
+            newConditions = {"addition":{"uuid":"867f0924-a917-4711-939b-90b179a96392", "sum":10}}  
+            req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
+                                    headers={'content-type': 'application/json'})
+            _ = urllib.request.urlopen(req)
                         
 
 
