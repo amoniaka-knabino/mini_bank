@@ -1,10 +1,13 @@
 from sys import argv
-import json, urllib.request
+import json
+import urllib.request
 import unittest
 import server.helpers.exceptions as e
 
 host = "localhost:8000"
 #host = "167.172.155.67/"
+
+
 def reload_db():
     with open('example.json', 'rb') as f:
         req = urllib.request.Request("http://"+host+"/api/refresh")
@@ -12,8 +15,17 @@ def reload_db():
 
         json_to_load_bytes = f.read()
     req = urllib.request.Request("http://"+host+"/api/load_db", data=json_to_load_bytes,
-                                headers={'content-type': 'application/json'})
+                                 headers={'content-type': 'application/json'})
     _ = urllib.request.urlopen(req)
+
+
+def get_status_dict(uuid_str):
+    newConditions = {"addition": {"uuid": uuid_str}}
+    req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
 
 class TestAPI(unittest.TestCase):
     def test_load(self):
@@ -24,7 +36,7 @@ class TestAPI(unittest.TestCase):
             json_to_load_bytes = f.read()
         json_to_load = json.loads(json_to_load_bytes)
         req = urllib.request.Request("http://"+host+"/api/load_db", data=json_to_load_bytes,
-                                    headers={'content-type': 'application/json'})
+                                     headers={'content-type': 'application/json'})
         response = urllib.request.urlopen(req)
         json_from_api = json.loads(response.read().decode('utf8'))
 
@@ -35,65 +47,54 @@ class TestAPI(unittest.TestCase):
                     if (d1 == d2):
                         equals += 1
         self.assertEqual(len(json_to_load["addition"]), equals)
-    
+
     def test_add(self):
         reload_db()
         delta = 10
-        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
-        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
-                                headers={'content-type': 'application/json'})
-        response = urllib.request.urlopen(req)
+        uuid = "26c940a1-7228-4ea2-a3bc-e6460b172040"
 
-        old_balance = json.loads(response.read().decode('utf8'))["addition"]["balance"]
-        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040", "sum":delta}}  
+        user_dict = get_status_dict(uuid)
+        old_balance = user_dict["balance"]
+
+        newConditions = {"addition": {"uuid": uuid, "sum": delta}}
         req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
-                                headers={'content-type': 'application/json'})
+                                     headers={'content-type': 'application/json'})
         _ = urllib.request.urlopen(req)
 
-        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
-        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
-                                headers={'content-type': 'application/json'})
-        response = urllib.request.urlopen(req)
-        new_balance = json.loads(response.read().decode('utf8'))["addition"]["balance"]
-        self.assertEqual(old_balance+delta,new_balance)
-    
+        user_dict = get_status_dict(uuid)
+        new_balance = user_dict["balance"]
+        self.assertEqual(old_balance+delta, new_balance)
+
     def test_substract(self):
         reload_db()
         delta = 10
-        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
-        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
-                                headers={'content-type': 'application/json'})
-        response = urllib.request.urlopen(req)
+        uuid = "26c940a1-7228-4ea2-a3bc-e6460b172040"
 
-        old_hold = json.loads(response.read().decode('utf8'))["addition"]["hold"]
-        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040", "sum":delta}}  
+        user_dict = get_status_dict(uuid)
+        old_hold = user_dict["hold"]
+        newConditions = {"addition": {"uuid": uuid, "sum": delta}}
         req = urllib.request.Request("http://"+host+"/api/substract", data=json.dumps(newConditions).encode('utf-8'),
-                                headers={'content-type': 'application/json'})
+                                     headers={'content-type': 'application/json'})
         _ = urllib.request.urlopen(req)
 
-        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
-        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
-                                headers={'content-type': 'application/json'})
-        response = urllib.request.urlopen(req)
-        new_hold = json.loads(response.read().decode('utf8'))["addition"]["hold"]
-        self.assertEqual(old_hold+delta,new_hold)
+        user_dict = get_status_dict(uuid)
+        new_hold = user_dict["hold"]
+        self.assertEqual(old_hold+delta, new_hold)
 
     def test_negative_sum(self):
         reload_db()
         with self.assertRaises(urllib.error.HTTPError):
-            newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040", "sum":-10}}  
+            newConditions = {"addition": {
+                "uuid": "26c940a1-7228-4ea2-a3bc-e6460b172040", "sum": -10}}
             req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
-                                    headers={'content-type': 'application/json'})
+                                         headers={'content-type': 'application/json'})
             _ = urllib.request.urlopen(req)
-        
 
     def test_closed_acc(self):
         reload_db()
         with self.assertRaises(urllib.error.HTTPError):
-            newConditions = {"addition":{"uuid":"867f0924-a917-4711-939b-90b179a96392", "sum":10}}  
+            newConditions = {"addition": {
+                "uuid": "867f0924-a917-4711-939b-90b179a96392", "sum": 10}}
             req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
-                                    headers={'content-type': 'application/json'})
+                                         headers={'content-type': 'application/json'})
             _ = urllib.request.urlopen(req)
-                        
-
-
