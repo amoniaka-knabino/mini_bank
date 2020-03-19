@@ -11,7 +11,7 @@ class DatabaseClient:
 
     def __enter__(self):
         self.conn = psycopg2.connect(dbname='postgres', user='postgres',
-                                     password='postgres', host='localhost')
+                                     password='postgres', host='postgres')
         self.cursor = self.conn.cursor()
         return self
 
@@ -76,7 +76,6 @@ status integer not null);""")
         return subscribers
 
     def select_user_by_uuid(self, uuid):
-        #self.cursor.execute('select * from subscribers where "uuid"= ?;',(str(uuid),))
         self.cursor.execute(
             'select * from subscribers where "uuid"= %s', (str(uuid),))
         u = self.cursor.fetchone()

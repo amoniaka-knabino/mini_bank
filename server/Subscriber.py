@@ -50,18 +50,21 @@ class Subscriber:
                 f"status: {'opened' if self.status else 'closed'}")
 
     def __eq__(self, other):
-        return (self.uuid == other.uuid and self.name == other.name
-                and self.balance == other.balance and self.hold == other.hold
-                and self.status == other.status)
+        return (self.uuid == other.uuid and self.name == other.name and
+                self.balance == other.balance and self.hold == other.hold and
+                self.status == other.status)
 
     def __hash__(self):
         """
-        Гарантируется, что uuid уникален в пределах множества абонентов => использовать его хэш эффективней, чем хэш имени или другого поля
+        Гарантируется, что uuid уникален в пределах множества абонентов
+        => использовать его хэш эффективней, чем хэш имени или другого поля
         """
         return self.uuid.__hash__()
 
     def dict_for_json(self):
-        return {"uuid": self.uuid, "name": self.name, "balance": self.balance, "hold": self.hold, "status": str(self.status)}
+        return {"uuid": self.uuid, "name": self.name,
+                "balance": self.balance, "hold": self.hold,
+                "status": str(self.status)}
 
 
 def generate_user(balance, hold, status):

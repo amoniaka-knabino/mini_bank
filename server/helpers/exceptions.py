@@ -25,7 +25,7 @@ def handle_exception(exception, addition):
         http_code = 404
         return jsonify({"status": http_code, "result": False,
                         "addition": addition,
-                        "description": "User is not found in database"}), http_code
+                        "description": "User is not found in database"}),http_code
     if type(exception) is InvalidSumException:
         http_code = 400
         return jsonify({"status": http_code, "result": False,
