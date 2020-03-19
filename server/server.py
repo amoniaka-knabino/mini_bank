@@ -9,14 +9,15 @@ import markdown
 import markdown.extensions.fenced_code
 
 app = Flask(__name__)
-
+db_changing_lock = threading.Lock()
 
 def hold_controller():
     while(True):
+        time.sleep(60*10)
         with DatabaseClient() as db:
-            time.sleep(60*10)
             print("Making everyones hold to zero")
-            db.substract_hold_of_every_sub()
+            with db_changing_lock:
+                db.substract_hold_of_every_sub()
 
 
 @app.before_first_request
@@ -62,11 +63,12 @@ def user_from_json(uuid=None, addition=None):
 def add(sum=None, uuid=None, addition=None):
     try:
         with DatabaseClient() as db:
-            user = db.select_user_by_uuid(uuid)
-            user.add(sum)
-            print(f"add {sum} to {user.uuid}, now balance is {user.balance}")
-            db.update_balance(user)
-            return jsonify({"status": 200, "result": True})
+            with db_changing_lock:
+                user = db.select_user_by_uuid(uuid)
+                user.add(sum)
+                print(f"add {sum} to {user.uuid}, now balance is {user.balance}")
+                db.update_balance(user)
+            return jsonify({"status": 200, "result": True, "addition": addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)
 
@@ -77,11 +79,12 @@ def substract(sum=None, uuid=None, addition=None):
     try:
         with DatabaseClient() as db:
             print(f"extracted params is : {(sum, uuid)}")
-            user = db.select_user_by_uuid(uuid)
-            user.substract(sum)
-            print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
-            db.update_hold(user)
-            return jsonify({"status": 200, "result": True})
+            with db_changing_lock:
+                user = db.select_user_by_uuid(uuid)
+                user.substract(sum)
+                print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
+                db.update_hold(user)
+            return jsonify({"status": 200, "result": True, "addition":addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)
 
@@ -89,8 +92,9 @@ def substract(sum=None, uuid=None, addition=None):
 @app.route('/api/refresh')
 def refresh_db():
     with DatabaseClient() as db:
-        db.drop_table()
-        db.create_table()
+        with db_changing_lock:
+            db.drop_table()
+            db.create_table()
         return jsonify({"status": 200, "result": True})
 
 
@@ -100,7 +104,8 @@ def load_db_from_json(addition=None):
     try:
         with DatabaseClient() as db:
             print(f"json['addition'] from POST request: {addition}")
-            db.load_from_json(addition)
+            with db_changing_lock:
+                db.load_from_json(addition)
             return jsonify({"status": 200, "result": True, "addition": addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)
