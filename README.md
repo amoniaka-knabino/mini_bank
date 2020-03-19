@@ -57,9 +57,10 @@ P.S. status == 1 => счет открыт
 
 запуск приложения: `docker-compose up --build -d` \ `./start.sh`
 остановка: `docker-compose down -v` \ `./stop.sh`
+посмотреть логи: `./view_web_logs.sh`
 
 отдельно от бд приложение можно запустить `python3 wsgi.py` , но нужно будет поменять `host` в инициализации Database в server/Database.py
-
+в данном случае логи пишутся в stdout
 #### тесты
 
 1. server/tests/test_*.py - тестируют классы
@@ -70,16 +71,16 @@ P.S. status == 1 => счет открыт
 done
 #### code
 1. add_subscribers не вызывая add_one_subscriber
-2. done
+2. localhost -> postgres
 3. обработка исключений бд (особенно повторный инсерт)
-4. print -> logger
+4. done
 5. done
-6. исправить опечатку в subtract
+6. 
 7. проверить завершение потоков
 8. тесты на апишку (in process)
 9. PEP8
-10. refactor var names
-11. логи внутри докера тоже
+10. 
+11. done
 #### tests
 1. сохранение состояние бд и восстановление его после выполнения тестов 
 
