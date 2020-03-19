@@ -40,6 +40,15 @@ status integer not null);""")
         self.cursor.execute(insert)
         self.conn.commit()
     
+    def insert_multiple_subscriber(self, sub_list):
+        subs_list_for_bd = [(str(sub.uuid), sub.name, sub.balance, sub.hold, 1 if sub.status else 0) for sub in sub_list]
+        insert = sql.SQL('INSERT INTO subscribers (uuid, name, balance, hold, status) VALUES {}').format(
+            sql.SQL(',').join(map(sql.Literal, subs_list_for_bd))
+        )
+        self.cursor.execute(insert)
+        self.conn.commit()
+
+    
     def update_balance(self, sub):
         self.cursor.execute('update subscribers set balance=%s where uuid=%s', ((sub.balance, str(sub.uuid))))
         self.conn.commit()
@@ -55,9 +64,7 @@ status integer not null);""")
             u.substract_hold()
             self.update_hold(u)
     
-    def insert_multiple_subscriber(self, sub_dict):
-        for sub in sub_dict:
-            self.add_one_subscriber(sub)
+
 
     def all_users(self):
         self.cursor.execute("select * from subscribers;")
