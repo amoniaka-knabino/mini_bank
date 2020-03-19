@@ -3,6 +3,7 @@ import json
 from flask import Flask, jsonify, request
 import helpers.exceptions as e
 
+
 def check_status(func):
     @wraps(func)
     def checked(self, *args):
@@ -11,6 +12,7 @@ def check_status(func):
         else:
             return func(self, *args)
     return checked
+
 
 def need_args(*needed_args_list):
     def real_decorator(func):
@@ -28,4 +30,3 @@ def need_args(*needed_args_list):
             return func(**kwargs)
         return inner
     return real_decorator
-    
