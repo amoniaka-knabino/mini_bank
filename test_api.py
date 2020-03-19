@@ -37,10 +37,46 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(len(json_to_load["addition"]), equals)
     
     def test_add(self):
-        pass
+        reload_db()
+        delta = 10
+        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
+        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
+                                headers={'content-type': 'application/json'})
+        response = urllib.request.urlopen(req)
+
+        old_balance = json.loads(response.read().decode('utf8'))["addition"]["balance"]
+        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040", "sum":delta}}  
+        req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
+                                headers={'content-type': 'application/json'})
+        _ = urllib.request.urlopen(req)
+
+        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
+        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
+                                headers={'content-type': 'application/json'})
+        response = urllib.request.urlopen(req)
+        new_balance = json.loads(response.read().decode('utf8'))["addition"]["balance"]
+        self.assertEqual(old_balance+delta,new_balance)
     
     def test_substract(self):
-        pass
+        reload_db()
+        delta = 10
+        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
+        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
+                                headers={'content-type': 'application/json'})
+        response = urllib.request.urlopen(req)
+
+        old_hold = json.loads(response.read().decode('utf8'))["addition"]["hold"]
+        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040", "sum":delta}}  
+        req = urllib.request.Request("http://"+host+"/api/substract", data=json.dumps(newConditions).encode('utf-8'),
+                                headers={'content-type': 'application/json'})
+        _ = urllib.request.urlopen(req)
+
+        newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040"}}  
+        req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
+                                headers={'content-type': 'application/json'})
+        response = urllib.request.urlopen(req)
+        new_hold = json.loads(response.read().decode('utf8'))["addition"]["hold"]
+        self.assertEqual(old_hold+delta,new_hold)
 
     def test_negative_sum(self):
         reload_db()
