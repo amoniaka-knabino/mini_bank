@@ -70,7 +70,7 @@ P.S. status == 1 => счет открыт
 #### deploy details
 done
 #### code
-1. add_subscribers не вызывая add_one_subscriber
+1. done
 2. localhost -> postgres
 3. обработка исключений бд (особенно повторный инсерт)
 4. done

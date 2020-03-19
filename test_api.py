@@ -34,7 +34,20 @@ class TestAPI(unittest.TestCase):
         pass
 
     def test_negative_sum(self):
-        pass
+        with open('example.json', 'rb') as f:
+            req = urllib.request.Request("http://"+host+"/api/refresh")
+            urllib.request.urlopen(req)
+
+            json_to_load_bytes = f.read()
+        req = urllib.request.Request("http://"+host+"/api/load_db", data=json_to_load_bytes,
+                                    headers={'content-type': 'application/json'})
+        _ = urllib.request.urlopen(req)
+        with self.assertRaises(urllib.error.HTTPError):
+            newConditions = {"addition":{"uuid":"26c940a1-7228-4ea2-a3bc-e6460b172040", "sum":-10}}  
+            req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
+                                    headers={'content-type': 'application/json'})
+            _ = urllib.request.urlopen(req)
+        
 
     def test_closed_acc(self):
         with open('example.json', 'rb') as f:
