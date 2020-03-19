@@ -83,18 +83,27 @@ class TestAPI(unittest.TestCase):
 
     def test_negative_sum(self):
         reload_db()
-        with self.assertRaises(urllib.error.HTTPError):
+        code = 200
+        try:
             newConditions = {"addition": {
                 "uuid": "26c940a1-7228-4ea2-a3bc-e6460b172040", "sum": -10}}
             req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
                                          headers={'content-type': 'application/json'})
             _ = urllib.request.urlopen(req)
+        except urllib.error.HTTPError as e:
+            code = e.code
+        self.assertEqual(code, 400)
 
     def test_closed_acc(self):
         reload_db()
-        with self.assertRaises(urllib.error.HTTPError):
+        code = 200
+        uuid = "867f0924-a917-4711-939b-90b179a96392"
+        try:
             newConditions = {"addition": {
-                "uuid": "867f0924-a917-4711-939b-90b179a96392", "sum": 10}}
+                "uuid": uuid, "sum": 10}}
             req = urllib.request.Request("http://"+host+"/api/add", data=json.dumps(newConditions).encode('utf-8'),
                                          headers={'content-type': 'application/json'})
             _ = urllib.request.urlopen(req)
+        except urllib.error.HTTPError as e:
+            code = e.code
+        self.assertEqual(code, 403)
