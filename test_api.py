@@ -4,8 +4,8 @@ import urllib.request
 import unittest
 import server.helpers.exceptions as e
 
-host = "localhost:8000"
-#host = "167.172.155.67/"
+#host = "localhost:8000"
+host = "167.172.155.67/"
 
 
 def reload_db():
@@ -26,8 +26,24 @@ def get_status_dict(uuid_str):
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
+def get_subs_json_bytes():
+    response = urllib.request.urlopen("http://"+host+"/api/subs")
+    return response.read()
+
 
 class TestAPI(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.db_backup = get_subs_json_bytes()
+
+    @classmethod
+    def tearDownClass(cls):
+        req = urllib.request.Request("http://"+host+"/api/refresh")
+        urllib.request.urlopen(req)
+        req = urllib.request.Request("http://"+host+"/api/load_db", data=cls.db_backup,
+                                 headers={'content-type': 'application/json'})
+        _ = urllib.request.urlopen(req)
+    
     def test_load(self):
         with open('example.json', 'rb') as f:
             req = urllib.request.Request("http://"+host+"/api/refresh")
