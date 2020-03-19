@@ -11,6 +11,7 @@ import markdown.extensions.fenced_code
 app = Flask(__name__)
 db_changing_lock = threading.Lock()
 
+
 def hold_controller():
     while(True):
         time.sleep(60*10)
@@ -28,7 +29,7 @@ def before_request():
 
 @app.route('/')
 def hello_world():
-    with open('README.md') as f:
+    with open('doc.md') as f:
         md_template_string = markdown.markdown(
             f.read(), extensions=["fenced_code"]
         )
@@ -66,7 +67,8 @@ def add(sum=None, uuid=None, addition=None):
             with db_changing_lock:
                 user = db.select_user_by_uuid(uuid)
                 user.add(sum)
-                print(f"add {sum} to {user.uuid}, now balance is {user.balance}")
+                print(
+                    f"add {sum} to {user.uuid}, now balance is {user.balance}")
                 db.update_balance(user)
             return jsonify({"status": 200, "result": True, "addition": addition})
     except Exception as exception:
@@ -84,7 +86,7 @@ def substract(sum=None, uuid=None, addition=None):
                 user.substract(sum)
                 print(f"sub {sum} from {user.uuid}, now hold is {user.hold}")
                 db.update_hold(user)
-            return jsonify({"status": 200, "result": True, "addition":addition})
+            return jsonify({"status": 200, "result": True, "addition": addition})
     except Exception as exception:
         return e.handle_exception(exception, addition)
 
