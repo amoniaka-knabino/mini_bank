@@ -73,6 +73,6 @@ def get_subs_set_from_json_file(filename):
 def get_subs_set_from_json(subs_from_json):
     subscribers = set()
     for u in subs_from_json:
-        sub = Subscriber(u["uuid"], u["name"], u["balance"], u["hold"], u["status"])
+        sub = Subscriber(u["uuid"], u["name"], u["balance"], u["hold"], u["status"]=='True')
         subscribers.add(sub)
     return subscribers
