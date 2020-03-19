@@ -1,5 +1,6 @@
 from flask import jsonify
 import json
+import psycopg2
 
 
 class API_Exception(Exception):
@@ -40,6 +41,11 @@ def handle_exception(exception, addition):
         return jsonify({"status": http_code, "result": False,
                         "addition": addition,
                         "description": "Bad JSON"}), http_code
+    if type(exception) is psycopg2.errors.UniqueViolation:
+        http_code = 400
+        return jsonify({"status": http_code, "result": False,
+                        "addition": addition,
+                        "description": "Tried to add subscriber who are already exists in database"}), http_code
     else:
         print(exception)
         http_code = 500
