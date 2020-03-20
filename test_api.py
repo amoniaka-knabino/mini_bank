@@ -5,8 +5,8 @@ import unittest
 import server.helpers.exceptions as e
 
 #host = "localhost"
-#host = "localhost:8000"
-host = "167.172.155.67/"
+host = "localhost:8000"
+#host = "167.172.155.67/"
 
 
 def reload_db():
@@ -130,3 +130,34 @@ class TestAPI(unittest.TestCase):
         except urllib.error.HTTPError as e:
             code = e.code
         self.assertEqual(code, 403)
+    
+    def test_json_without_required_params(self):
+        reload_db()
+        code = 200
+        uuid = "867f0924-a917-4711-939b-90b179a96392"
+        try:
+            newConditions = {"addition": {
+                "uuid": uuid}}
+            req = urllib.request.Request("http://"+host+"/api/add",
+                                         data=json.dumps(newConditions).encode('utf-8'),
+                                         headers={'content-type': 'application/json'})
+            _ = urllib.request.urlopen(req)
+        except urllib.error.HTTPError as e:
+            code = e.code
+        self.assertEqual(code, 400)
+    
+    def test_not_json(self):
+        reload_db()
+        code = 200
+        uuid = "867f0924-a917-4711-939b-90b179a96392"
+        try:
+            newConditions = {"addition": {
+                "uuid": uuid}}
+            req = urllib.request.Request("http://"+host+"/api/add",
+                                            data=b"some other data",
+                                            headers={'content-type': 'application/json'})
+            _ = urllib.request.urlopen(req)
+        except urllib.error.HTTPError as e:
+            code = e.code
+        self.assertEqual(code, 400)
+
