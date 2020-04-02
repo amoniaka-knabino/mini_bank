@@ -11,6 +11,8 @@ services:
         volumes:
             - ./init.sql:/docker-entrypoint-initdb.d/init.sql
         restart: on-failure:3
+        networks:
+            internal:
 
     web:
         build:
@@ -21,6 +23,9 @@ services:
              - postgres
         expose:
              - 8000
+        networks:
+            default:
+            internal:
 
     nginx:
         build: ./nginx
@@ -30,3 +35,11 @@ services:
             - web
             - postgres
         restart: on-failure:3
+        networks:
+            default:
+            internal:
+    
+networks:
+    default:
+    internal:
+        internal: true
