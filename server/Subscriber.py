@@ -35,10 +35,7 @@ class Subscriber:
     @d.check_status
     def check_substract(self, substraction):
         result = self.balance - self.hold - substraction
-        if result < 0:
-            return False
-        else:
-            return True
+        return result >= 0
 
     def check_param(self, sum):
         if sum < 0:
